@@ -34,7 +34,7 @@ import * as request from 'request';
 import * as util from 'util';
 import { AmazonUser } from '../alexa-skill-user-manager';
 import { NextcloudUser } from '../nextcloud-oauth2-client/src';
-import { AmzNCForainKeys } from './entity/AmzNCForainKey';
+import { AmzNCForainKeys } from './entity/AmzNCForainKeys';
 import { promisify } from 'util';
 
 const LaunchRequestHandler: RequestHandler = {
