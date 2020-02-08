@@ -1,0 +1,6 @@
+[submodule "nextcloud-oauth2-client"]
+	path = nextcloud-oauth2-client
+	url = ../nextcloud-oauth2-client.git
+[submodule "alexa-skill-user-manager"]
+	path = alexa-skill-user-manager
+	url = ../alexa-skill-user-manager.git
