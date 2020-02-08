@@ -17,6 +17,11 @@
   },
   "homepage": "https://github.com/VolkerChristian/alexa-wastereminder#readme",
   "dependencies": {
-    "ts-node": "^8.6.2"
+    "@types/request": "^2.48.4",
+    "ask-sdk": "^2.7.0",
+    "request": "^2.88.0",
+    "ts-node": "^8.6.2",
+    "typeorm": "^0.2.22",
+    "util": "^0.12.1"
   }
 }
