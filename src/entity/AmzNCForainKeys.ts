@@ -1,6 +1,6 @@
 //import "reflect-metadata";
 require('reflect-metadata');
-import { Entity, Index, PrimaryGeneratedColumn, JoinColumn, OneToOne, UpdateDateColumn, CreateDateColumn, VersionColumn, getConnection } from "typeorm";
+import { Entity, Index, PrimaryGeneratedColumn, JoinColumn, OneToOne, UpdateDateColumn, CreateDateColumn, VersionColumn, getConnection, Column } from "typeorm";
 import { AmazonUser } from '../../alexa-skill-user-manager/src';
 import { NextcloudUser } from '../../nextcloud-oauth2-client/src';
 
@@ -23,6 +23,9 @@ export class AmzNCForainKeys {
     @JoinColumn()
     @Index("NextcloudUser-Idx")
     nectcloudUser: NextcloudUser;
+
+    @Column()
+    data: number;
 
     @UpdateDateColumn()
     changed: Date;

@@ -4,7 +4,7 @@
   "description": "Waste Reminder for Alexa",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -17,11 +17,23 @@
   },
   "homepage": "https://github.com/VolkerChristian/alexa-wastereminder#readme",
   "dependencies": {
+    "@types/cookie-parser": "^1.4.2",
+    "@types/express": "^4.17.2",
     "@types/request": "^2.48.4",
     "ask-sdk": "^2.7.0",
+    "client-oauth2": "^4.2.5",
+    "cookie-parser": "^1.4.4",
+    "express": "^4.17.1",
+    "mysql": "^2.18.1",
     "request": "^2.88.0",
     "ts-node": "^8.6.2",
     "typeorm": "^0.2.22",
+    "typescript": "^3.7.5",
     "util": "^0.12.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^25.1.2",
+    "jest": "^25.1.0",
+    "ts-jest": "^25.2.0"
   }
 }

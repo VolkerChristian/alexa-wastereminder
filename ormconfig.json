@@ -1,25 +1,85 @@
-{
-   "name": "wastereminder",
-   "type": "mysql",
-   "host": "proliant.home.vchrist.at",
-   "port": 3306,
-   "username": "wastereminder",
-   "password": "!!!SoMaSi01!!!",
-   "database": "WasteReminder",
-   "synchronize": true,
-   "logging": false,
-   "entities": [
-      "src/entity/**/*.{ts,js}"
-   ],
-   "migrations": [
-      "src/migration/**/*.{ts,js}"
-   ],
-   "subscribers": [
-      "src/subscriber/**/*.{ts,js}"
-   ],
-   "cli": {
-      "entitiesDir": "src/entity",
-      "migrationsDir": "src/migration",
-      "subscribersDir": "src/subscriber"
+[
+   {
+      "name": "wastereminder",
+      "type": "mysql",
+      "host": "proliant.home.vchrist.at",
+      "port": 3306,
+      "username": "wastereminder",
+      "password": "!!!SoMaSi01!!!",
+      "database": "WasteReminder",
+      "synchronize": true,
+      "logging": true,
+      "entities": [
+         "src/entity/**/*.{ts,js}",
+         "alexa-skill-user-manager/src/entity/**/*.{ts,js}",
+         "nextcloud-oauth2-client/src/entity/**/*.{ts,js}"
+      ],
+      "migrations": [
+         "src/migration/**/*.{ts,js}",
+         "alexa-skill-user-manager/src/migration/**/*.{ts,js}",
+         "nextcloud-oauth2-client/src/migration/**/*.{ts,js}"
+      ],
+      "subscribers": [
+         "src/subscriber/**/*.{ts,js}",
+         "alexa-skill-user-manager/src/subscriber/**/*.{ts,js}",
+         "nextcloud-oauth2-client/src/subscriber/**/*.{ts,js}"
+      ],
+      "cli": {
+         "entitiesDir": "src/entity",
+         "migrationsDir": "src/migration",
+         "subscribersDir": "src/subscriber"
+      }
+   },
+   {
+      "name": "amazon",
+      "type": "mysql",
+      "host": "proliant.home.vchrist.at",
+      "port": 3306,
+      "username": "wastereminder",
+      "password": "!!!SoMaSi01!!!",
+      "database": "WasteReminder",
+      "synchronize": true,
+      "logging": false,
+      "entities": [
+         "src/entity/**/*.{ts,js}",
+         "alexa-skill-user-manager/src/entity/**/*.{ts,js}",
+         "nextcloud-oauth2-client/src/entity/**/*.{ts,js}"
+      ],
+      "migrations": [
+         "src/migration/**/*.{ts,js}"
+      ],
+      "subscribers": [
+         "src/subscriber/**/*.{ts,js}"
+      ],
+      "cli": {
+         "entitiesDir": "src/entity",
+         "migrationsDir": "src/migration",
+         "subscribersDir": "src/subscriber"
+      }
+   },
+   {
+      "name": "nextcloud",
+      "type": "mysql",
+      "host": "proliant.home.vchrist.at",
+      "port": 3306,
+      "username": "wastereminder",
+      "password": "!!!SoMaSi01!!!",
+      "database": "WasteReminder",
+      "synchronize": true,
+      "logging": false,
+      "entities": [
+         "**/src/entity/**/*.{ts,js}"
+      ],
+      "migrations": [
+         "**/src/migration/**/*.{ts,js}"
+      ],
+      "subscribers": [
+         "**/src/subscriber/**/*.{ts,js}"
+      ],
+      "cli": {
+         "entitiesDir": "src/entity",
+         "migrationsDir": "src/migration",
+         "subscribersDir": "src/subscriber"
+      }
    }
-}
+]
