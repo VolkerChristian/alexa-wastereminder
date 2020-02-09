@@ -1,6 +1,17 @@
 //import "reflect-metadata";
 require('reflect-metadata');
-import { Entity, Index, PrimaryGeneratedColumn, JoinColumn, OneToOne, UpdateDateColumn, CreateDateColumn, VersionColumn, getConnection, Column } from "typeorm";
+import {
+    Entity,
+    Index,
+    PrimaryGeneratedColumn,
+    JoinColumn,
+    OneToOne,
+    UpdateDateColumn,
+    CreateDateColumn,
+    VersionColumn,
+    Column,
+    getRepository
+} from "typeorm";
 import { AmazonUser } from '../../alexa-skill-user-manager/src';
 import { NextcloudUser } from '../../nextcloud-oauth2-client/src';
 
@@ -38,7 +49,7 @@ export class AmzNCForainKeys {
     
     static save(forainKeys: AmzNCForainKeys) {
         return new Promise<AmzNCForainKeys>((resolve, reject) => {
-            getConnection('wastereminder').getRepository<AmzNCForainKeys>('AmzNCForainKeys')
+            getRepository<AmzNCForainKeys>('AmzNCForainKeys')
                 .save(forainKeys)
                 .then(forainKey => resolve(forainKey))
                 .catch(reason => reject(reason));
@@ -47,7 +58,7 @@ export class AmzNCForainKeys {
 
     static delete(forainKey: AmzNCForainKeys) {
         return new Promise<AmzNCForainKeys>((resolve, reject) => {
-            getConnection('wastereminder').getRepository<AmzNCForainKeys>('AmzNCForainKeys')
+            getRepository<AmzNCForainKeys>('AmzNCForainKeys')
                 .remove(forainKey)
                 .then(forainKey => resolve(forainKey))
                 .catch(reason => reject(reason));

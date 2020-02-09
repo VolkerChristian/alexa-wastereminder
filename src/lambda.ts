@@ -31,11 +31,10 @@ import {
 } from 'ask-sdk-model';
 
 import * as request from 'request';
-import * as util from 'util';
-//import { AmazonUser } from '../alexa-skill-user-manager';
-//import { NextcloudUser } from '../nextcloud-oauth2-client/src';
 import { AmzNCForainKeys } from './entity/AmzNCForainKeys';
 import { promisify } from 'util';
+import { AmazonUser } from '../alexa-skill-user-manager/src';
+import { NextcloudUser } from '../nextcloud-oauth2-client/src';
 
 const LaunchRequestHandler: RequestHandler = {
     canHandle(handlerInput) {
@@ -158,11 +157,9 @@ const ProactiveEventHandler: RequestHandler = {
         console.log('Permissions' + (isSubscribed ? 'JA' : 'NEIN'));
 
         try {
-            /*
             const user = await AmazonUser.getUser(getUserId(handlerInput.requestEnvelope));
             user.proactivePermission = true;
             await AmazonUser.save(user);
-            */
 
             return handlerInput.responseBuilder.getResponse();
         } catch (error) {
@@ -197,13 +194,13 @@ const AccountLinkedEventHandler: RequestHandler = {
             const oc_data = JSON.parse(response.body);
             console.log('OC Response: ' + JSON.stringify(oc_data, null, 4));
             const amzNCForainKey: AmzNCForainKeys = new AmzNCForainKeys();
-/*
+
             const amazonUser: AmazonUser = await AmazonUser.getUser(getUserId(handlerInput.requestEnvelope));
             const nextcloudUser: NextcloudUser = await NextcloudUser.getUser(oc_data.ocs.data.id);
 
             amzNCForainKey.amazonUser = amazonUser;
             amzNCForainKey.nectcloudUser = nextcloudUser;
-*/
+
             await AmzNCForainKeys.save(amzNCForainKey);
 
             return handlerInput.responseBuilder.getResponse();
@@ -221,17 +218,16 @@ const SkillEnabledEventHandler: RequestHandler = {
         console.log('ALL AlexaSkillEvent.SkillEnabled ' + JSON.stringify(handlerInput, null, 4));
         console.log('AWS UserID ' + getUserId(handlerInput.requestEnvelope));
         console.log('API Endpoint ' + handlerInput.requestEnvelope.context.System.apiEndpoint);
-        /*
+        
         const user = new AmazonUser();
 
         user.userId = getUserId(handlerInput.requestEnvelope);
         user.applicationId = handlerInput.requestEnvelope.context.System.application.applicationId;
         user.apiEndpoint = handlerInput.requestEnvelope.context.System.apiEndpoint;
         user.apiAccessToken = getApiAccessToken(handlerInput.requestEnvelope);
-        */
         
         try {
-//            await AmazonUser.save(user);
+            await AmazonUser.save(user);
 
             return handlerInput.responseBuilder.getResponse();
         } catch (error) {
@@ -252,7 +248,7 @@ const SkillDisabledEventHandler: RequestHandler = {
         console.log('API Endpoint ' + handlerInput.requestEnvelope.context.System.apiEndpoint);
 
         try {
-            // await AmazonUser.delete(getUserId(requestEnvelope), handlerInput.requestEnvelope.context.System.application.applicationId);
+            await AmazonUser.delete(getUserId(requestEnvelope), handlerInput.requestEnvelope.context.System.application.applicationId);
 
             return handlerInput.responseBuilder.getResponse();
         } catch (error) {

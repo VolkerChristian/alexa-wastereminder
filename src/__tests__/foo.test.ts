@@ -1,15 +1,16 @@
-//import { AmazonUser } from '../../alexa-skill-user-manager/src';
-import { createConnection } from 'typeorm';
+import { AmazonUser } from '../../alexa-skill-user-manager/src';
+import { createConnection, getRepository } from 'typeorm';
 
 test('insert amazonuser', (done) => {
-    createConnection('wastereminder')
+    createConnection()
         .then(connection => {
-            /*
+            
             let user: AmazonUser = new AmazonUser();
             user.userId = 'voc';
-            connection.getRepository<AmazonUser>('AmazonUser').save(user);
+
+            getRepository<AmazonUser>('AmazonUser').save(user);
             expect(user.userId).toBe('voc');
-            */
+            
             done();
         })
         .catch(error => {
