@@ -1,5 +1,5 @@
 {
-   "name": "amazon",
+   "name": "wastereminder",
    "type": "mysql",
    "host": "proliant.home.vchrist.at",
    "port": 3306,
