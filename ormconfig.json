@@ -6,7 +6,7 @@
       "username": "wastereminder",
       "password": "!!!SoMaSi01!!!",
       "database": "WasteReminder",
-      "synchronize": false,
+      "synchronize": true,
       "logging": false,
       "entities": [
          "src/entity/**/*.{ts,js}",

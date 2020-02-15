@@ -147,22 +147,24 @@ const ProactiveEventHandler: RequestHandler = {
     },
     async handle(handlerInput: HandlerInput) {
         handlerInput.serviceClientFactory?.getEndpointEnumerationServiceClient
-        var subscriptions = (handlerInput.requestEnvelope.request as events.skillevents.ProactiveSubscriptionChangedRequest).body.subscriptions;
+        var subscriptions = (handlerInput.requestEnvelope.request as events.skillevents.ProactiveSubscriptionChangedRequest).body?.subscriptions;
 
-        var isSubscribed = subscriptions?.filter(value => value.eventName == 'AMAZON.TrashCollectionAlert.Activated');
+        var isSubscribed = subscriptions?.filter(value => value.eventName == 'AMAZON.TrashCollectionAlert.Activated') ? true : false;
 
         console.log('ALL AlexaSkillEvent.ProactiveSubscriptionChanged ' + JSON.stringify(handlerInput, null, 4));
         console.log('AWS User ' + getUserId(handlerInput.requestEnvelope));
         console.log('API Endpoint ' + handlerInput.requestEnvelope.context.System.apiEndpoint);
-        console.log('Permissions' + (isSubscribed ? 'JA' : 'NEIN'));
+        console.log('Permissions ' + (isSubscribed ? 'JA' : 'NEIN'));
 
         try {
             const user = await AmazonUser.getUser(getUserId(handlerInput.requestEnvelope));
-            user.proactivePermission = true;
+            user.proactivePermission = isSubscribed;
             await AmazonUser.save(user);
 
+            console.log("ProactiveEventHandler: OK");
             return handlerInput.responseBuilder.getResponse();
         } catch (error) {
+            console.log("ProactiveEventHandler: " + error);
             return handlerInput.responseBuilder.getResponse();
         }
     }
@@ -196,15 +198,22 @@ const AccountLinkedEventHandler: RequestHandler = {
             const amzNCForainKey: AmzNCForainKeys = new AmzNCForainKeys();
 
             const amazonUser: AmazonUser = await AmazonUser.getUser(getUserId(handlerInput.requestEnvelope));
-            const nextcloudUser: NextcloudUser = await NextcloudUser.getUser(oc_data.ocs.data.id);
+            amazonUser.accountLinked = true;
+
+            let nextcloudUser: NextcloudUser = await NextcloudUser.getUser(oc_data.ocs.data.id);
+            if (!nextcloudUser) {
+                nextcloudUser = new NextcloudUser(oc_data.ocs.data.id);
+            }
 
             amzNCForainKey.amazonUser = amazonUser;
-            amzNCForainKey.nectcloudUser = nextcloudUser;
+            amzNCForainKey.nextcloudUser = nextcloudUser;
 
             await AmzNCForainKeys.save(amzNCForainKey);
 
+            console.log("AccountLinkedEventHandler: OK");
             return handlerInput.responseBuilder.getResponse();
         } catch (error) {
+            console.log("AccountLinkedEventHandler: " + error);
             return handlerInput.responseBuilder.getResponse();
         }
     }
@@ -229,8 +238,10 @@ const SkillEnabledEventHandler: RequestHandler = {
         try {
             await AmazonUser.save(user);
 
+            console.log("SkillEnabledEventHandler: OK");
             return handlerInput.responseBuilder.getResponse();
         } catch (error) {
+            console.log("SkillEnabledEventHandler: " + error);
             return handlerInput.responseBuilder.getResponse();
         }
     }
@@ -250,19 +261,21 @@ const SkillDisabledEventHandler: RequestHandler = {
         try {
             await AmazonUser.delete(getUserId(requestEnvelope), handlerInput.requestEnvelope.context.System.application.applicationId);
 
+            console.log("SkillDisabledEventHandler: OK");
             return handlerInput.responseBuilder.getResponse();
         } catch (error) {
+            console.log("SkillDisabledEventHandler: " + error);
             return handlerInput.responseBuilder.getResponse();
         }
     }
 };
 
-//console.log('Test: ' + (typeof hallo == 'undefined') ? 'ja' : 'nein');
+// console.log('Test: ' + (typeof hallo == 'undefined') ? 'ja' : 'nein');
 // The SkillBuilder acts as the entry point for your skill, routing all request and response
 // payloads to the handlers above. Make sure any new handlers or interceptors you've
 // defined are included below. The order matters - they're processed top to bottom.
 
-export = SkillBuilders.custom()
+export let skill = SkillBuilders.custom()
     .addRequestHandlers(
         LaunchRequestHandler,
         HelloWorldIntentHandler,
@@ -278,45 +291,3 @@ export = SkillBuilders.custom()
     .addErrorHandlers(ErrorHandler)
     .withSkillId('amzn1.ask.skill.5119403b-f6c6-45f8-bd7e-87787e6f5da2')
     .create();
-
-
-
-/*
-var apiConfiguration: services.ApiConfiguration = {
-    apiClient: new DefaultApiClient(),
-    apiEndpoint: 'hihi',
-    authorizationValue: 'Bearer ' + <skill.token>
-};
-
-
-var authenticationConfiguration: services.AuthenticationConfiguration = {
-    clientId: 'client',
-    clientSecret: 'clientSecret'
-};
-
-var pesc = new services.proactiveEvents.ProactiveEventsServiceClient(apiConfiguration, authenticationConfiguration);
-
-
-let expiryTime = new Date();
-expiryTime.setHours(expiryTime.getHours() + 23);
-
-var proactiveEventRequest = {} as services.proactiveEvents.CreateProactiveEventRequest;
-
-proactiveEventRequest.event.name = 'AMAZON.TrashCollectionAlert.Activated';
-proactiveEventRequest.event.payload = {
-    alert: {
-        garbageTypes: ['LANDFILL', 'RECYCLABLE_PLASTICS', 'WASTE_PAPER'],
-        collectionDayOfWeek: 'TUESDAY'
-    }
-};
-
-
-proactiveEventRequest.expiryTime = expiryTime.toISOString();
-//proactiveEventRequest.localizedAttributes
-proactiveEventRequest.referenceId = 'wastecalendar-event-' + Date();
-proactiveEventRequest.relevantAudience.payload = 'amz:...';
-proactiveEventRequest.relevantAudience.type = 'Unicast';
-proactiveEventRequest.timestamp = new Date().toISOString(),
-
-pesc.createProactiveEvent(proactiveEventRequest, 'DEVELOPMENT');
-*/

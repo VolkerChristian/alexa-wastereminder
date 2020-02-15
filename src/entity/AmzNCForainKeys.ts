@@ -22,22 +22,24 @@ export class AmzNCForainKeys {
     id: number;
 
     @OneToOne(type => AmazonUser, {
-        onDelete: 'CASCADE'
+        onDelete: 'CASCADE',
+        cascade: ['insert', 'update']
     })
     @JoinColumn()
     @Index("AmazonUser-Idx")
     amazonUser: AmazonUser;
 
     @OneToOne(type => NextcloudUser, {
-        onDelete: 'CASCADE'
+        onDelete: 'CASCADE',
+        cascade: ['insert', 'update']
     })
     @JoinColumn()
     @Index("NextcloudUser-Idx")
-    nectcloudUser: NextcloudUser;
-
+    nextcloudUser: NextcloudUser;
+/*
     @Column()
     data: number;
-
+*/
     @UpdateDateColumn()
     changed: Date;
 
