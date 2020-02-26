@@ -1,12 +1,12 @@
 import 'reflect-metadata';
 import express, { Router, Request, Response, RequestHandler } from 'express';
-import { createConnection, getRepository } from 'typeorm';
-import { router, NextcloudUser, NextcloudToken } from '../nextcloud-oauth2-client/src';
+import { createConnection, getCustomRepository } from 'typeorm';
 import { skill } from './lambda';
 import { ExpressAdapter } from 'ask-sdk-express-adapter';
 import { AmzNCForainKeys } from './entity/AmzNCForainKeys';
-//import { NextcloudToken } from '../nextcloud-oauth2-client/src/entity/NextcloudToken';
-import { AmazonUser, AmazonApiEndpoint } from '../alexa-skill-user-manager/src';
+import { AmzNCForainKeysRepository } from './AmzNCForainKeysRepository';
+import { router, getEntities as getNextcloudUserEntities, setConnection as nextcloudSetConnection } from 'nextcloud-oauth2-client';
+import { getEntities as getAmazonUserManagerEntities, setConnection as amazonSetConnection } from 'alexa-skill-user-manager';
 import {
     getRequestType,
     getIntentName,
@@ -94,31 +94,8 @@ const paeProcess: RequestHandler = (req: Request, res: Response) => {
 
     let str: string = "";
 
-    getRepository<AmzNCForainKeys>('AmzNCForainKeys')
-        .createQueryBuilder('link')
-        .innerJoinAndMapOne(
-            'link.nextcloudUser',
-            NextcloudUser, 'n',
-            'link.nextcloudUserId = n.id'
-        )
-        .leftJoinAndMapOne(
-            'n.token',
-            NextcloudToken, 't',
-            'n.id = t.userId'
-
-        )
-        .innerJoinAndMapOne(
-            'link.amazonUser',
-            AmazonUser, 'a',
-            'link.amazonUserId = a.id'
-        )
-        .leftJoinAndMapOne(
-            'a.amazonApiEndpoint',
-            AmazonApiEndpoint, 'e',
-            'e.applicationId = a.applicationId'
-        )
-        .where('a.applicationId = "' + skillId + '"')
-        .getMany()
+    getCustomRepository(AmzNCForainKeysRepository)
+        .getAllForSkillId(skillId)
         .then((values: AmzNCForainKeys[]) => {
             values.forEach((value: AmzNCForainKeys) => {
                 str += "==============================\n"
@@ -138,8 +115,31 @@ const paeRouter = Router();
 paeRouter.get('/', paeProcess);
 
 
-createConnection()
-    .then(() => {
+getNextcloudUserEntities();
+
+
+async function connect() {
+    let connection = await createConnection({
+        type: "mysql",
+        host: "proliant.home.vchrist.at",
+        port: 3306,
+        username: "wastereminder",
+        password: "!!!SoMaSi01!!!",
+        database: "WasteReminder",
+        synchronize: true,
+        logging: false,
+        entities: Array().concat(getAmazonUserManagerEntities(), getNextcloudUserEntities(), [AmzNCForainKeys])
+    });
+
+    return connection;
+}
+
+
+
+connect()
+    .then(connection => {
+        nextcloudSetConnection(connection);
+        amazonSetConnection(connection);
         const app = express();
 
         app.use('/', router);

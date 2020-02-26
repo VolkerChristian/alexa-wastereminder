@@ -1,9 +1,8 @@
 import { createConnection, getRepository } from 'typeorm';
 import { AmzNCForainKeys } from './entity/AmzNCForainKeys';
-import { AmazonUser, AmazonApiEndpoint, getApiToken } from '../alexa-skill-user-manager/src';
-import { NextcloudUser } from '../nextcloud-oauth2-client/src';
+import { AmazonUser, AmazonApiEndpoint, getApiToken, getAmazonUserRepository } from 'alexa-skill-user-manager';
+import { NextcloudUser, NextcloudToken, getNextcloudUserRepository } from 'nextcloud-oauth2-client';
 import util from 'util';
-import { NextcloudToken } from '../nextcloud-oauth2-client/src/entity/NextcloudToken';
 
 
 const a = () => {
@@ -12,10 +11,10 @@ const a = () => {
         let key: AmzNCForainKeys = new AmzNCForainKeys();
         //        key.data = 3;
 
-        let amzUser: AmazonUser = await AmazonUser.getUser('AmazonUser');
+        let amzUser: AmazonUser = await getAmazonUserRepository().getUser('AmazonUser');
         key.amazonUser = amzUser;
 
-        let ncUser: NextcloudUser = await NextcloudUser.getUser('voc');
+        let ncUser: NextcloudUser = await getNextcloudUserRepository().getUser('voc');
         key.nextcloudUser = ncUser;
 
         getRepository<AmzNCForainKeys>('AmzNCForainKeys')
