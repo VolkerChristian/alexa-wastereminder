@@ -36,10 +36,7 @@ export class AmzNCForainKeys {
     @JoinColumn()
     @Index("NextcloudUser-Idx")
     nextcloudUser: NextcloudUser;
-/*
-    @Column()
-    data: number;
-*/
+
     @UpdateDateColumn()
     changed: Date;
 
