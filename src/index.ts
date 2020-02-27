@@ -41,6 +41,7 @@ setOAuth2Config(aptOAuth2Config);
 import nextcloudConfig from './ncconfig.json';
 setNextcloudConfig(nextcloudConfig);
 
+
 const paeSend = async (amzNCForainKeys: AmzNCForainKeys) => {
     let expiryTime = new Date();
     expiryTime.setHours(expiryTime.getHours() + 23);
@@ -72,8 +73,6 @@ const paeSend = async (amzNCForainKeys: AmzNCForainKeys) => {
     }
 
     let result: services.ApiResponse;
-
-    //console.log(JSON.stringify(proactiveEventRequest, null, 4));
 
     const apiConfiguration: services.ApiConfiguration = {
         apiClient: new DefaultApiClient(),
@@ -122,9 +121,6 @@ const paeRouter = Router();
 paeRouter.get('/', paeProcess);
 
 
-getNextcloudUserEntities();
-
-
 async function connect() {
     let connection = await createConnection({
         type: "mysql",
@@ -140,7 +136,6 @@ async function connect() {
 
     return connection;
 }
-
 
 
 connect()
