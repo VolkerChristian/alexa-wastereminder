@@ -33,10 +33,12 @@ import {
     services
 } from 'ask-sdk-model';
 
-import { aptOAuth2Config } from '../amzconfig.json';
+const basePath = process.cwd();
+
+import { aptOAuth2Config } from './amzconfig.json';
 setOAuth2Config(aptOAuth2Config);
 
-import nextcloudConfig from '../ncconfig.json';
+import nextcloudConfig from './ncconfig.json';
 setNextcloudConfig(nextcloudConfig);
 
 const paeSend = async (amzNCForainKeys: AmzNCForainKeys) => {
