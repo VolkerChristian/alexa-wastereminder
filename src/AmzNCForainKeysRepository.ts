@@ -16,7 +16,6 @@ export class AmzNCForainKeysRepository extends Repository<AmzNCForainKeys> {
                 'n.token',
                 NextcloudToken, 't',
                 'n.id = t.userId'
-
             )
             .innerJoinAndMapOne(
                 'link.amazonUser',
