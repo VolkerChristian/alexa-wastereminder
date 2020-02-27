@@ -5,8 +5,8 @@ import { skill } from './lambda';
 import { ExpressAdapter } from 'ask-sdk-express-adapter';
 import { AmzNCForainKeys } from './entity/AmzNCForainKeys';
 import { AmzNCForainKeysRepository } from './AmzNCForainKeysRepository';
-import { router, getEntities as getNextcloudUserEntities, setConnection as nextcloudSetConnection } from 'nextcloud-oauth2-client';
-import { getEntities as getAmazonUserManagerEntities, setConnection as amazonSetConnection } from 'alexa-skill-user-manager';
+import { router, getEntities as getNextcloudUserEntities, setConnection as nextcloudSetConnection, setNextcloudConfig } from 'nextcloud-oauth2-client';
+import { getEntities as getAmazonUserManagerEntities, setConnection as amazonSetConnection, setOAuth2Config } from 'alexa-skill-user-manager';
 import {
     getRequestType,
     getIntentName,
@@ -33,6 +33,11 @@ import {
     services
 } from 'ask-sdk-model';
 
+import { aptOAuth2Config } from '../amzconfig.json';
+setOAuth2Config(aptOAuth2Config);
+
+import nextcloudConfig from '../ncconfig.json';
+setNextcloudConfig(nextcloudConfig);
 
 const paeSend = async (amzNCForainKeys: AmzNCForainKeys) => {
     let expiryTime = new Date();

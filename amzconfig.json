@@ -1,0 +1,8 @@
+{
+    "aptOAuth2Config": {
+        "accessTokenUri": "https://api.amazon.com/auth/o2/token",
+        "clientId": "amzn1.application-oa2-client.c1494a447d77405883037efdc06baad6",
+        "clientSecret": "07c7affba53c9d2632186cff30c678d5ed243efc6140436c533f2eac32e8dd11",
+        "scopes": ["alexa::proactive_events"]
+    }
+}
