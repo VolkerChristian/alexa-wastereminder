@@ -5,7 +5,7 @@ import { AmazonUser, AmazonApiEndpoint } from 'alexa-skill-user-manager';
 
 @EntityRepository(AmzNCForainKeys)
 export class AmzNCForainKeysRepository extends Repository<AmzNCForainKeys> {
-    getAllForSkillId(skillId: string): Promise<AmzNCForainKeys[]> {
+    getAllWithSkillId(skillId: string): Promise<AmzNCForainKeys[]> {
         return this.createQueryBuilder('link')
             .innerJoinAndMapOne(
                 'link.nextcloudUser',
@@ -28,6 +28,6 @@ export class AmzNCForainKeysRepository extends Repository<AmzNCForainKeys> {
                 'e.applicationId = a.applicationId'
             )
             .where('a.applicationId = "' + skillId + '"')
-            .getMany()
+            .getMany();
     }
 }

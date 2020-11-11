@@ -1,12 +1,12 @@
 import 'reflect-metadata';
 import express, { Router, Request, Response, RequestHandler } from 'express';
-import { createConnection, getCustomRepository } from 'typeorm';
+import { createConnection, getCustomRepository, Connection } from 'typeorm';
 import { skill } from './lambda';
 import { ExpressAdapter } from 'ask-sdk-express-adapter';
 import { AmzNCForainKeys } from './entity/AmzNCForainKeys';
 import { AmzNCForainKeysRepository } from './AmzNCForainKeysRepository';
 import { router, getEntities as getNextcloudUserEntities, setConnection as nextcloudSetConnection, setNextcloudConfig } from 'nextcloud-oauth2-client';
-import { getEntities as getAmazonUserManagerEntities, setConnection as amazonSetConnection, setOAuth2Config } from 'alexa-skill-user-manager';
+import { getEntities as getAmazonUserManagerEntities, setConnection as amazonSetConnection, setOAuth2Config, AmazonUser } from 'alexa-skill-user-manager';
 import {
     getRequestType,
     getIntentName,
@@ -32,6 +32,10 @@ import {
 import {
     services
 } from 'ask-sdk-model';
+import { CredentialsOptions, Credentials } from 'dav';
+import * as dav from 'dav';
+import util from 'util';
+import ICAL from 'ical.js';
 
 const basePath = process.cwd();
 
@@ -42,7 +46,7 @@ import nextcloudConfig from './ncconfig.json';
 setNextcloudConfig(nextcloudConfig);
 
 
-const paeSend = async (amzNCForainKeys: AmzNCForainKeys) => {
+const paeSend = async (amazonUser: AmazonUser) => {
     let expiryTime = new Date();
     expiryTime.setHours(expiryTime.getHours() + 23);
 
@@ -59,7 +63,7 @@ const paeSend = async (amzNCForainKeys: AmzNCForainKeys) => {
     const relevantAudience: services.proactiveEvents.RelevantAudience = {
         type: 'Unicast',
         payload: {
-            user: amzNCForainKeys.amazonUser.userId
+            user: amazonUser.userId
         }
     }
 
@@ -76,8 +80,8 @@ const paeSend = async (amzNCForainKeys: AmzNCForainKeys) => {
 
     const apiConfiguration: services.ApiConfiguration = {
         apiClient: new DefaultApiClient(),
-        apiEndpoint: amzNCForainKeys.amazonUser.apiEndpoint,
-        authorizationValue: 'Bearer ' + amzNCForainKeys.amazonUser.amazonApiEndpoint.apiAccessToken
+        apiEndpoint: amazonUser.apiEndpoint,
+        authorizationValue: 'Bearer ' + amazonUser.amazonApiEndpoint.apiAccessToken
     };
 
     const authenticationConfiguration: services.AuthenticationConfiguration = {
@@ -89,25 +93,25 @@ const paeSend = async (amzNCForainKeys: AmzNCForainKeys) => {
     try {
         result = await pesc.callCreateProactiveEvent(proactiveEventRequest, 'DEVELOPMENT');
     } catch (error) {
-        console.log("Error: " + error);
+        console.log('Error: ' + error);
     }
-    console.log("Status Code: " + JSON.stringify(result.statusCode, null, 4));
+    console.log('Status Code: ' + JSON.stringify(result.statusCode, null, 4));
 }
 
 
 const paeProcess: RequestHandler = (req: Request, res: Response) => {
-    const skillId = "amzn1.ask.skill.5119403b-f6c6-45f8-bd7e-87787e6f5da2";
+    const skillId = 'amzn1.ask.skill.5119403b-f6c6-45f8-bd7e-87787e6f5da2';
 
-    let str: string = "";
+    let str: string = '';
 
     getCustomRepository(AmzNCForainKeysRepository)
-        .getAllForSkillId(skillId)
+        .getAllWithSkillId(skillId)
         .then((values: AmzNCForainKeys[]) => {
             values.forEach((value: AmzNCForainKeys) => {
-                str += "==============================\n"
-                str += JSON.stringify(value, null, 4) + "\n";
-                str += "==============================\n";
-                paeSend(value);
+                str += '==============================\n';
+                str += JSON.stringify(value, null, 4) + '\n';
+                str += '==============================\n';
+                paeSend(value.amazonUser);
             });
             res.send(str);
         })
@@ -117,18 +121,98 @@ const paeProcess: RequestHandler = (req: Request, res: Response) => {
 }
 
 
+const caldav: RequestHandler = (req: Request, res: Response) => {
+    const skillId = 'amzn1.ask.skill.5119403b-f6c6-45f8-bd7e-87787e6f5da2';
+    let str: string = '';
+    getCustomRepository(AmzNCForainKeysRepository)
+        .getAllWithSkillId(skillId)
+        .then((linkedAccounts: AmzNCForainKeys[]) => {
+            linkedAccounts.forEach((linkedAccount: AmzNCForainKeys) => {
+                str += '==============================\n'
+                str += JSON.stringify(linkedAccount, null, 4) + '\n';
+                str += '==============================\n';
+                console.log(str);
+                str = '';
+                linkedAccount.nextcloudUser.getToken().then(token => {
+                    console.log('AccessToken: ' + token.data.access_token);
+                    console.log('RefreshToken: ' + token.data.refresh_token);
+                    console.log('Expired: ' + token.expired());
+                    console.log('ExpiresIn: ' + token.data.expires_in);
+
+                    let credentials = new Credentials({
+                        accessToken: token.data.access_token,
+                        expiration: Date.now() + +token.data.expires_in
+
+                    });
+
+                    let xhr = new dav.transport.OAuth2(credentials);
+                    let client = new dav.Client(xhr);
+
+                    client.createAccount({
+                        server: 'https://cloud.vchrist.at/remote.php/dav/files/' + linkedAccount.nextcloudUser.userName,
+                        accountType: 'caldav'
+                    })
+                        .then(account => {
+                            account.calendars.forEach(calendar => {
+                                str += 'Found calendar named: ' + calendar.displayName + '\n';
+                                if (calendar.displayName == 'Müllabfuhr') {
+                                    let filters = [{
+                                        type: 'comp-filter',
+                                        attrs: { name: 'VCALENDAR' },
+                                        children: [{
+                                            type: 'comp-filter',
+                                            attrs: { name: 'VEVENT' },
+                                            children: [{
+                                                type: 'time-range',
+                                                attrs: {
+                                                    start: '19970714T170000Z',
+                                                    end: '20210714T170000Z'
+                                                }
+                                            }]
+                                        }]
+                                    }];
+
+                                    dav.syncCalendar(calendar, { filters: filters, xhr: xhr })
+                                        .then(calendar => {
+                                            calendar.objects.forEach((object: dav.CalendarObject) => {
+                                                let comp = ICAL.Component.fromString(object.calendarData);
+                                                let vevent = comp.getFirstSubcomponent('vevent');
+                                                let event = new ICAL.Event(vevent);
+                                                str += 'Event Summary: ' + event.summary + '\nLocale Start: ' + event.startDate.toJSDate() + '\nLocale End: ' + event.endDate.toJSDate() + '\n';
+                                                console.log('Event Summary: ' + event.summary + '\nLocale Start: ' + event.startDate.toJSDate() + '\nLocale End: ' + event.endDate.toJSDate());
+                                            });
+                                            console.log(str);
+                                            res.status(200).send(str);
+                                        })
+                                        .catch(reason => {
+                                            console.log(reason);
+                                            res.status(404).send(reason);
+                                        });
+                                }
+                            });
+                        })
+                        .catch(reason => {
+                            console.log(reason);
+                            res.status(404).send(reason);
+                        });
+                });
+            });
+        });
+}
+
+
 const paeRouter = Router();
 paeRouter.get('/', paeProcess);
 
 
-async function connect() {
+async function connect() : Promise<Connection> {
     let connection = await createConnection({
-        type: "mysql",
-        host: "proliant.home.vchrist.at",
+        type: 'mysql',
+        host: 'proliant.home.vchrist.at',
         port: 3306,
-        username: "wastereminder",
-        password: "!!!SoMaSi01!!!",
-        database: "WasteReminder",
+        username: 'wastereminder',
+        password: '!!!SoMaSi01!!!',
+        database: 'WasteReminder',
         synchronize: true,
         logging: false,
         entities: Array().concat(getAmazonUserManagerEntities(), getNextcloudUserEntities(), [AmzNCForainKeys])
@@ -146,12 +230,20 @@ connect()
 
         app.use('/', router);
 
+        app.get('/dav', caldav);
+
         app.post('/wastereminder/handler', new ExpressAdapter(skill, true, true).getRequestHandlers());
 
         app.use('/wastereminder/pae', paeRouter);
 
         app.listen(8080, () => {
-            console.log("Wastereinder listening on 8080");
+            console.log('Wastereinder listening on 8080');
         });
+
+        let date = (new Date()).toISOString()
+            .replace(/-/g, '')
+            .replace(/:/g, '')
+            .replace(/\.[0-9][0-9][0-9]/g, '');
+        console.log(date);
     })
     .catch(reason => console.error(reason));
