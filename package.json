@@ -4,6 +4,8 @@
   "description": "Waste Reminder for Alexa",
   "main": "index.js",
   "scripts": {
+    "start": "node -r ts-node/register src/index.ts",
+    "build": "tsc -p ./tsconfig.json",
     "test": "jest"
   },
   "repository": {
@@ -17,24 +19,29 @@
   },
   "homepage": "https://github.com/VolkerChristian/alexa-wastereminder#readme",
   "dependencies": {
-    "@types/cookie-parser": "^1.4.2",
-    "@types/express": "^4.17.2",
-    "@types/request": "^2.48.4",
-    "ask-sdk": "^2.7.0",
-    "ask-sdk-express-adapter": "^2.0.1",
-    "client-oauth2": "^4.2.5",
-    "cookie-parser": "^1.4.4",
+    "alexa-skill-user-manager": "file:../alexa-skill-user-manager/alexa-skill-user-manager-0.0.1.tgz",
+    "ask-sdk": "^2.10.0",
+    "ask-sdk-express-adapter": "^2.10.0",
+    "client-oauth2": "^4.3.3",
+    "cookie-parser": "^1.4.5",
+    "dav": "^1.8.0",
     "express": "^4.17.1",
     "mysql": "^2.18.1",
-    "request": "^2.88.0",
-    "ts-node": "^8.6.2",
-    "typeorm": "^0.2.22",
-    "typescript": "^3.7.5",
-    "util": "^0.12.1"
+    "nextcloud-oauth2-client": "file:../nextcloud-oauth2-client/nextcloud-oauth2-client-0.0.1.tgz",
+    "request": "^2.88.2",
+    "typeorm": "^0.2.29",
+    "util": "^0.12.3"
   },
   "devDependencies": {
-    "@types/jest": "^25.1.2",
-    "jest": "^25.1.0",
-    "ts-jest": "^25.2.0"
+    "@types/cookie-parser": "^1.4.2",
+    "@types/dav": "^1.7.1",
+    "@types/express": "^4.17.9",
+    "@types/jest": "^25.2.3",
+    "@types/node": "^13.13.30",
+    "@types/request": "^2.48.5",
+    "jest": "^25.5.4",
+    "ts-jest": "^25.5.1",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7"
   }
 }

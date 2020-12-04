@@ -1,0 +1,29 @@
+{
+    "oauth2Config": {
+        "clientId": "UjBsDWcsbl5hnl0vNqAop7emLQrtEEvacbnJKCmnx2g43T0m7HK0iTrS4LWdFOXp",
+        "clientSecret": "M9Go6AyMBWS3eOUnmwUSNhqW9EDp8rzQbDn9b2lAle8kXibnGr8AqXHzOaHpXzFY",
+        "accessTokenUri": "https://cloud.vchrist.at/index.php/apps/oauth2/api/v1/token",
+        "authorizationUri": "https://cloud.vchrist.at/index.php/apps/oauth2/authorize",
+        "redirectUri": "https://ep.vchrist.at/auth/nextcloud/grant",
+        "scopes": []
+    },
+    "cookieOptions": {
+        "path": "/nodejs/auth/nextcloud/grant"
+    },
+    "path": {
+        "link": "/auth/nextcloud",
+        "unlink": "/auth/nextcloud/unlink",
+        "redirect": "/auth/nextcloud/grant"
+    },
+    "cookieOptionValues": {
+        "domain": "nextcloudConfig.cookieData.domain",
+        "encode": "function to encode cookie values",
+        "path": "nextcloudConfig.cookieData.path",
+        "httpOnly": true,
+        "secure": false,
+        "maxAge": 600000,
+        "expires": "Date.now() + 600000",
+        "signed": false,
+        "sameSite": false
+    }
+}

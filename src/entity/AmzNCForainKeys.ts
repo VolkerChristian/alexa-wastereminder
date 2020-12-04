@@ -1,5 +1,3 @@
-//import "reflect-metadata";
-require('reflect-metadata');
 import {
     Entity,
     Index,
@@ -12,8 +10,8 @@ import {
     Column,
     getRepository
 } from "typeorm";
-import { AmazonUser } from '../../alexa-skill-user-manager/src';
-import { NextcloudUser } from '../../nextcloud-oauth2-client/src';
+import { AmazonUser } from 'alexa-skill-user-manager';
+import { NextcloudUser } from 'nextcloud-oauth2-client';
 
 
 @Entity()
@@ -45,22 +43,4 @@ export class AmzNCForainKeys {
 
     @VersionColumn()
     version: Number;
-    
-    static save(forainKeys: AmzNCForainKeys) {
-        return new Promise<AmzNCForainKeys>((resolve, reject) => {
-            getRepository<AmzNCForainKeys>('AmzNCForainKeys')
-                .save(forainKeys)
-                .then(forainKey => resolve(forainKey))
-                .catch(reason => reject(reason));
-        });
-    }
-
-    static delete(forainKey: AmzNCForainKeys) {
-        return new Promise<AmzNCForainKeys>((resolve, reject) => {
-            getRepository<AmzNCForainKeys>('AmzNCForainKeys')
-                .remove(forainKey)
-                .then(forainKey => resolve(forainKey))
-                .catch(reason => reject(reason));
-        });
-    }
 }

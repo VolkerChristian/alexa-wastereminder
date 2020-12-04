@@ -33,8 +33,10 @@ import {
 import * as request from 'request';
 import { AmzNCForainKeys } from './entity/AmzNCForainKeys';
 import { promisify } from 'util';
-import { AmazonUser } from '../alexa-skill-user-manager/src';
-import { NextcloudUser } from '../nextcloud-oauth2-client/src';
+import { AmazonUser, getAmazonUserRepository } from 'alexa-skill-user-manager';
+import { NextcloudUser, getNextcloudUserRepository } from 'nextcloud-oauth2-client';
+import { AmzNCForainKeysRepository } from './AmzNCForainKeysRepository';
+import { getCustomRepository } from 'typeorm';
 
 const LaunchRequestHandler: RequestHandler = {
     canHandle(handlerInput) {
@@ -157,9 +159,9 @@ const ProactiveEventHandler: RequestHandler = {
         console.log('Permissions ' + (isSubscribed ? 'JA' : 'NEIN'));
 
         try {
-            const user = await AmazonUser.getUser(getUserId(handlerInput.requestEnvelope));
+            const user = await getAmazonUserRepository().getUser(getUserId(handlerInput.requestEnvelope));
             user.proactivePermission = isSubscribed;
-            await AmazonUser.save(user);
+            await getAmazonUserRepository().save(user);
 
             console.log("ProactiveEventHandler: OK");
             return handlerInput.responseBuilder.getResponse();
@@ -197,10 +199,10 @@ const AccountLinkedEventHandler: RequestHandler = {
             console.log('OC Response: ' + JSON.stringify(oc_data, null, 4));
             const amzNCForainKey: AmzNCForainKeys = new AmzNCForainKeys();
 
-            const amazonUser: AmazonUser = await AmazonUser.getUser(getUserId(handlerInput.requestEnvelope));
+            const amazonUser: AmazonUser = await getAmazonUserRepository().getUser(getUserId(handlerInput.requestEnvelope));
             amazonUser.accountLinked = true;
 
-            let nextcloudUser: NextcloudUser = await NextcloudUser.getUser(oc_data.ocs.data.id);
+            let nextcloudUser: NextcloudUser = await getNextcloudUserRepository().getUser(oc_data.ocs.data.id);
             if (!nextcloudUser) {
                 nextcloudUser = new NextcloudUser(oc_data.ocs.data.id);
             }
@@ -208,7 +210,7 @@ const AccountLinkedEventHandler: RequestHandler = {
             amzNCForainKey.amazonUser = amazonUser;
             amzNCForainKey.nextcloudUser = nextcloudUser;
 
-            await AmzNCForainKeys.save(amzNCForainKey);
+            await getCustomRepository(AmzNCForainKeysRepository).save(amzNCForainKey);
 
             console.log("AccountLinkedEventHandler: OK");
             return handlerInput.responseBuilder.getResponse();
@@ -236,7 +238,7 @@ const SkillEnabledEventHandler: RequestHandler = {
         user.apiAccessToken = getApiAccessToken(handlerInput.requestEnvelope);
         
         try {
-            await AmazonUser.save(user);
+            await getAmazonUserRepository().save(user);
 
             console.log("SkillEnabledEventHandler: OK");
             return handlerInput.responseBuilder.getResponse();
@@ -259,7 +261,7 @@ const SkillDisabledEventHandler: RequestHandler = {
         console.log('API Endpoint ' + handlerInput.requestEnvelope.context.System.apiEndpoint);
 
         try {
-            await AmazonUser.delete(getUserId(requestEnvelope), handlerInput.requestEnvelope.context.System.application.applicationId);
+            await getAmazonUserRepository().deleteUser(getUserId(requestEnvelope), handlerInput.requestEnvelope.context.System.application.applicationId);
 
             console.log("SkillDisabledEventHandler: OK");
             return handlerInput.responseBuilder.getResponse();
