@@ -25,7 +25,7 @@
     "client-oauth2": "^4.3.3",
     "cookie-parser": "^1.4.5",
     "dav": "^1.8.0",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "mysql": "^2.18.1",
     "nextcloud-oauth2-client": "file:../nextcloud-oauth2-client/nextcloud-oauth2-client-0.0.1.tgz",
     "request": "^2.88.2",
